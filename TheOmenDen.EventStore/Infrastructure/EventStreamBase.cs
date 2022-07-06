@@ -73,12 +73,21 @@ internal sealed class EventStreamBase : IEventStream
                 valueToAdd,
                 (aggregateId, existingEvents) =>
                 {
-                    if (existingEvents.Contains(entity))
+                    if (existingEvents.Any(e => e.Equals(entity)))
                     {
                         throw new ArgumentException("Cannot insert duplicate events");
                     }
 
-                    existingEvents.AddRange(valueToAdd);
+                    if (existingEvents.Any())
+                    {
+                        var currentIndex = existingEvents.Max()?.MinorVersion ?? 0;
+                        entity.MinorVersion = currentIndex + 1;
+
+                        existingEvents.Add(entity);
+                        return existingEvents;
+                    }
+
+                    existingEvents.Add(entity);
 
                     return existingEvents;
                 });

@@ -31,14 +31,7 @@ public abstract class BaseEvent : IEquatable<BaseEvent>, IComparable<BaseEvent>
 
     public override string ToString() => $"{AggregateType} {MajorVersion}.{MinorVersion}";
 
-    public bool Equals(BaseEvent other) =>
-        other is not null 
-        && Id == other.Id
-        || (
-               AggregateId  == other.AggregateId
-            && MinorVersion == other.MinorVersion 
-            && MajorVersion == other.MajorVersion
-            );
+    public bool Equals(BaseEvent other) => other is not null && Id == other.Id;
 
 
     public override bool Equals(object obj)

@@ -16,7 +16,7 @@ public static class ServiceCollectionExtensions
             .WithTransientLifetime());
 
         services.Scan(scan => scan.FromAssembliesOf(typeof(IAsyncEventSubscriber<,>), containerType)
-            .AddClasses(c => c.AssignableTo(typeof(IAsyncEventSubscriber<,>)))
+            .AddClasses(c => c.AssignableTo(typeof(AsyncEventHandler<,>)))
             .AsImplementedInterfaces()
             .WithTransientLifetime());
 

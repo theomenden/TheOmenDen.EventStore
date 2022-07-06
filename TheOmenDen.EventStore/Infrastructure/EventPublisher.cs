@@ -15,12 +15,12 @@ public abstract class EventPublisher<TTRiggerEvent, TResponse>: IEventPublisher<
 public abstract class AsyncEventPublisher<TTriggerEvent, TResponse> : IAsyncEventPublisher<TTriggerEvent, TResponse>
     where TTriggerEvent : BaseEvent, IEvent<TResponse>
 {
-    protected AsyncEventPublisher(IEventStream events)
+    protected AsyncEventPublisher(IEventBroker<TTriggerEvent> broker)
     {
-        Events = events;
+        Broker = broker;
     }
 
-    protected IEventStream Events { get; }
+    protected IEventBroker<TTriggerEvent> Broker { get; }
 
     public abstract ValueTask<TResponse> PublishAsync(TTriggerEvent @event);
 }

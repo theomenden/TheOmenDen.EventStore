@@ -18,15 +18,20 @@ public abstract class EventHandler<TTriggerEvent, TResponse> : IEventSubscriber<
 public abstract class AsyncEventHandler<TTriggerEvent, TResponse> : IAsyncEventSubscriber<TTriggerEvent, TResponse>
     where TTriggerEvent : BaseEvent, IEvent<TResponse>
 {
-    protected AsyncEventHandler(IEventStream eventStream)
+    protected AsyncEventHandler(IEventBroker<TTriggerEvent> eventBroker)
     {
-        EventStream = eventStream;
+        EventBroker = eventBroker;
     }
 
-    protected IEventStream EventStream { get; }
+    protected IEventBroker<TTriggerEvent> EventBroker { get; }
 
-    public abstract ValueTask<TResponse> SubscribeAsync(TTriggerEvent @event,
-        CancellationToken cancellationToken = default);
+    public abstract ValueTask<TResponse> SubscribeAsync(TTriggerEvent @event, CancellationToken cancellationToken = default);
 
-    public abstract Task UnsubscribeAsync(Guid eventId);
+    public abstract ValueTask<TResponse> SubscribeAsync(Action<BaseEvent, CancellationToken> onEventSubscription);
+
+    public abstract ValueTask<TResponse> SubscribeAsync(Action<TTriggerEvent> onSubscription, CancellationToken cancellationToken = default);
+    
+    public abstract ValueTask<TResponse> SubscribeAsync(Action<bool> onEventSubscription, CancellationToken cancellationToken = default);
+
+    public abstract Task UnsubscribeAsync(Action<BaseEvent, CancellationToken> onEventUnsubscribe, CancellationToken cancellationToken = default);
 }

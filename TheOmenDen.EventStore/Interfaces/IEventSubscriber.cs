@@ -1,6 +1,4 @@
-﻿using TheOmenDen.EventStore.Events;
-
-namespace TheOmenDen.EventStore.Interfaces;
+﻿namespace TheOmenDen.EventStore.Interfaces;
 
 public interface IEventSubscriber<in TTriggerEvent, out TResponse>
     where TTriggerEvent : IEvent<TResponse>
@@ -10,11 +8,13 @@ public interface IEventSubscriber<in TTriggerEvent, out TResponse>
     void Unsubscribe(Guid eventId);
 }
 
-public interface IAsyncEventSubscriber<in TTriggerEvent, TResponse>
+public interface IAsyncEventSubscriber<out TTriggerEvent, TResponse>
     where TTriggerEvent : IEvent<TResponse>
 {
-    ValueTask<TResponse> SubscribeAsync(TTriggerEvent @event, CancellationToken cancellationToken = new());
+    ValueTask<TResponse> SubscribeAsync(Action<TTriggerEvent> onSubscription, CancellationToken cancellationToken = new());
 
-    Task UnsubscribeAsync(Guid eventId);
+    ValueTask<TResponse> SubscribeAsync(Action<bool> onEventSubscription, CancellationToken cancellationToken = new());
+
+    Task UnsubscribeAsync(Action<BaseEvent, CancellationToken> onEventUnsubscribe, CancellationToken cancellationToken = new());
 }
 
