@@ -161,7 +161,9 @@ internal sealed class EventStreamBase : IEventStream
     {
         return _events.Values
             .SelectMany(e => e)
-            .OrderBy(e => e.Aggregate);
+            .OrderBy(e => e.CreatedAt)
+            .ThenByDescending(e => e.MajorVersion)
+            .ThenByDescending(e => e.MinorVersion);
     }
 
     public ValueTask<IEnumerable<BaseEvent>> GetAllAsync(CancellationToken cancellationToken = new CancellationToken())

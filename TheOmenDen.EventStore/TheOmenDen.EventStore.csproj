@@ -1,16 +1,49 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+		<Deterministic>false</Deterministic>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
-    <PackageReference Include="TheOmenDen.Shared" Version="2022.7.5.231" />
-  </ItemGroup>
+	<PropertyGroup>
+		<Date>$([System.DateTime]::Now.ToString("yyy.M.d.HHmm"))</Date>
+		<AssemblyFileVersionAttribute>[assembly:System.Reflection.AssemblyFileVersion("$(Date)")]</AssemblyFileVersionAttribute>
+	</PropertyGroup>
+
+	<Target Name="GenerateVersionInfo" BeforeTargets="BeforeBuild">
+		<WriteLinesToFile File="Properties\VersionInfo.cs" Lines="$(AssemblyFileVersionAttribute)" Overwrite="true">
+		</WriteLinesToFile>
+	</Target>
+	<PropertyGroup>
+		<Date>$([System.DateTime]::Now.ToString("yyy.M.d.HHmm"))</Date>
+		<AssemblyFileVersionAttribute>[assembly:System.Reflection.AssemblyFileVersion("$(Date)")]</AssemblyFileVersionAttribute>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Description>A collection of classes for the a basic implementation of the Event Sourcing Pattern</Description>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Company>The Omen Den L.L.C.</Company>
+		<Copyright>2022</Copyright>
+		<PackageProjectUrl>https://github.com/theomenden/TheOmenDen.EventStore</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/theomenden/TheOmenDen.EventStore</RepositoryUrl>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<PackageVersion>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</PackageVersion>
+		<AssemblyVersion>$([System.DateTime]::Now.ToString("yyy.MM.dd.HHmm"))</AssemblyVersion>
+		<SignAssembly>False</SignAssembly>
+		<Authors>Andy - Alu</Authors>
+	</PropertyGroup>
+	<Target Name="GenerateVersionInfo" BeforeTargets="BeforeBuild">
+		<WriteLinesToFile File="Properties\VersionInfo.cs" Lines="$(AssemblyFileVersionAttribute)" Overwrite="true">
+		</WriteLinesToFile>
+	</Target>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
+		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
+		<PackageReference Include="Scrutor" Version="4.2.0" />
+		<PackageReference Include="TheOmenDen.Shared" Version="2022.7.5.231" />
+	</ItemGroup>
 
 </Project>

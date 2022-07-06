@@ -1,6 +1,13 @@
 ﻿namespace TheOmenDen.EventStore.Events;
-
-public abstract class BaseEvent: IEquatable<BaseEvent>, IComparable<BaseEvent>
+#nullable disable
+/// <summary>
+/// <para>A base event class that allows for the construction and unique identifying of a particular event</para>
+/// <para>Meant to be subscribed to with a compatible <see cref="IEventSubscriber{TTriggerEvent, TResponse}"/></para>
+/// <para>Eventually to be published by a compatible <see cref="IEventPublisher{TSubscribedEvent, TResponse}"/></para>
+/// <inheritdoc cref="IEquatable{T}"/>
+/// <inheritdoc cref="IComparable{T}"/>
+/// </summary>
+public abstract class BaseEvent : IEquatable<BaseEvent>, IComparable<BaseEvent>
 {
     protected BaseEvent()
     {
@@ -8,37 +15,31 @@ public abstract class BaseEvent: IEquatable<BaseEvent>, IComparable<BaseEvent>
         CreatedAt = DateTime.Now;
     }
 
-    public Guid Id { get; set; }
+    public Guid Id { get; init; }
 
-    public DateTime CreatedAt { get; set; }
+    public DateTime CreatedAt { get; init; }
 
-    public int MajorVersion { get; set; }
+    public int MajorVersion { get; set; } = 1;
 
-    public int MinorVersion { get; set; }
+    public int MinorVersion { get; set; } = 0;
 
-    public string Data { get; set; }
+    public string Data { get; init; }
 
-    public Type AggregateType { get; set; }
+    public Type AggregateType { get; init; }
 
-    public Guid AggregateId { get; set; }
+    public Guid AggregateId { get; init; }
 
-    public string Aggregate { get; set; }
+    public override string ToString() => $"{AggregateType} {MajorVersion}.{MinorVersion}";
 
-    public override string ToString()
-    {
-        return $"{Aggregate}: {AggregateType} {MajorVersion}.{MinorVersion}";
-    }
+    public bool Equals(BaseEvent other) =>
+        other is not null 
+        && Id == other.Id
+        || (
+               AggregateId  == other.AggregateId
+            && MinorVersion == other.MinorVersion 
+            && MajorVersion == other.MajorVersion
+            );
 
-    public bool Equals(BaseEvent other)
-    {
-        return other is not null &&
-               Id == other.Id
-               || (
-                   AggregateId == other.AggregateId
-                   && MinorVersion == other.MinorVersion
-                   && MajorVersion == other.MajorVersion
-               );
-    }
 
     public override bool Equals(object obj)
     {
@@ -55,23 +56,29 @@ public abstract class BaseEvent: IEquatable<BaseEvent>, IComparable<BaseEvent>
         return obj is BaseEvent other && Equals(other);
     }
 
-    public override int GetHashCode()
-    {
-        return HashCode.Combine(Id, CreatedAt);
-    }
+    public override int GetHashCode() => HashCode.Combine(Id, CreatedAt);
 
     public int CompareTo(BaseEvent other)
     {
+        if (other is null)
+        {
+            return 1;
+        }
+
         return MinorVersion.CompareTo(other.MinorVersion)
                + MajorVersion.CompareTo(other.MajorVersion)
                + CreatedAt.CompareTo(other.CreatedAt);
     }
 }
 
-public abstract class BaseEvent<T> : BaseEvent, IEvent<T> 
+/// <summary>
+/// Generic wrapper for <see cref="BaseEvent"/>
+/// </summary>
+/// <typeparam name="T">The underlying type the event is acting upon</typeparam>
+public abstract class BaseEvent<T> : BaseEvent, IEvent<T>
 {
     protected BaseEvent()
-        :base()
+        : base()
     {
         AggregateType = typeof(T);
     }

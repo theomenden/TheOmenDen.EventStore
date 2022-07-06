@@ -1,6 +1,9 @@
-﻿using TheOmenDen.EventStore.Events;
-
-namespace TheOmenDen.EventStore.Interfaces;
+﻿namespace TheOmenDen.EventStore.Interfaces;
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TSubscribedEvent"></typeparam>
+/// <typeparam name="TResponse"></typeparam>
 public interface IEventPublisher<in TSubscribedEvent, out TResponse>
     where TSubscribedEvent : IEvent<TResponse>
 {

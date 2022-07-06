@@ -1,27 +1,32 @@
-﻿using TheOmenDen.EventStore.Events;
+﻿namespace TheOmenDen.EventStore.Infrastructure;
 
-namespace TheOmenDen.EventStore.Infrastructure;
-
-internal sealed class EventHandler<TTriggerEvent, TResponse> : IEventSubscriber<TTriggerEvent, TResponse>,
-    IAsyncEventSubscriber<TTriggerEvent, TResponse>
+public abstract class EventHandler<TTriggerEvent, TResponse> : IEventSubscriber<TTriggerEvent, TResponse>
     where TTriggerEvent : BaseEvent, IEvent<TResponse> 
 {
-    private readonly IEventStream _eventStream;
-
-    public EventHandler(IEventStream eventStream)
+    protected EventHandler(IEventStream eventStream)
     {
-        _eventStream = eventStream;
+        EventStream = eventStream;
     }
 
-    public TResponse Subscribe(TTriggerEvent @event)
-    {
-        
+    protected IEventStream EventStream { get; }
 
-        return default;
+    public abstract TResponse Subscribe(TTriggerEvent @event);
+
+    public abstract void Unsubscribe(Guid eventId);
+}
+
+public abstract class AsyncEventHandler<TTriggerEvent, TResponse> : IAsyncEventSubscriber<TTriggerEvent, TResponse>
+    where TTriggerEvent : BaseEvent, IEvent<TResponse>
+{
+    protected AsyncEventHandler(IEventStream eventStream)
+    {
+        EventStream = eventStream;
     }
 
-    public ValueTask<TResponse> SubscribeAsync(TTriggerEvent @event, CancellationToken cancellationToken = default)
-    {
-        return ValueTask.FromResult<TResponse>(default);
-    }
+    protected IEventStream EventStream { get; }
+
+    public abstract ValueTask<TResponse> SubscribeAsync(TTriggerEvent @event,
+        CancellationToken cancellationToken = default);
+
+    public abstract Task UnsubscribeAsync(Guid eventId);
 }
