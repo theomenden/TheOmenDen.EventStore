@@ -44,7 +44,7 @@ public class EventQueue: IEventQueue
         }
     }
 
-    public async Task PublishAsync(IEvent @event, CancellationToken cancellationToken = new CancellationToken())
+    public Task PublishAsync(IEvent @event, CancellationToken cancellationToken = new CancellationToken())
     {
         throw new NotImplementedException();
     }
@@ -59,7 +59,7 @@ public class EventQueue: IEventQueue
         _subscribers[name].Add((@event) => action((T)@event));
     }
 
-    public async Task SubscribeAsync<T>(Action<T> action, CancellationToken cancellationToken = new CancellationToken())
+    public Task SubscribeAsync<T>(Action<T> action, CancellationToken cancellationToken = new CancellationToken())
     {
         throw new NotImplementedException();
     }
@@ -68,17 +68,19 @@ public class EventQueue: IEventQueue
     {
         var key = new EventOverrideKey
         {
-            EventName = typeof(T).FullName,
+            EventName = typeof(T).FullName ?? nameof(T), 
             IdentityTenant = tenant
         };
 
         if (_overriders.Any(x => x.Key.EventName == key.EventName && x.Key.IdentityTenant == key.IdentityTenant))
-            throw new AmbiguousCommandHandlerException(key.EventName);
+        {
+            throw new AmbiguousCommandHandlerException(key?.EventName ?? nameof(key));
+        }
 
         _overriders.Add(key, (command) => action((T)command));
     }
 
-    public async Task OverrideAsync<T>(Action<T> action, Guid tenant, CancellationToken cancellationToken = new CancellationToken()) where T : IEvent
+    public Task OverrideAsync<T>(Action<T> action, Guid tenant, CancellationToken cancellationToken = new CancellationToken()) where T : IEvent
     {
         throw new NotImplementedException();
     }

@@ -53,7 +53,7 @@ where TState : AggregateState, new()
         }
     }
 
-    public async ValueTask<IEvent[]> FlushUncommittedChangesAsync(CancellationToken cancellationToken = default)
+    public ValueTask<IEvent[]> FlushUncommittedChangesAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -66,7 +66,7 @@ where TState : AggregateState, new()
         }
     }
 
-    public async ValueTask<IEvent[]> GetUncommittedChangesAsync(CancellationToken cancellationToken = default)
+    public ValueTask<IEvent[]> GetUncommittedChangesAsync(CancellationToken cancellationToken = default)
     {
         throw new NotImplementedException();
     }
@@ -91,7 +91,7 @@ where TState : AggregateState, new()
         }
     }
 
-    public async Task RehydrateAsync(IEnumerable<IEvent> history, CancellationToken cancellationToken = new CancellationToken())
+    public Task RehydrateAsync(IEnumerable<IEvent> history, CancellationToken cancellationToken = new CancellationToken())
     {
         foreach (var change in history.ToList().AsReadOnly())
         {
@@ -106,6 +106,8 @@ where TState : AggregateState, new()
 
             MinorVersion++;
         }
+
+        return Task.CompletedTask;
     }
 
     protected void Apply<T>(T changeEvent, Action<T> applyAction) where T : IEvent

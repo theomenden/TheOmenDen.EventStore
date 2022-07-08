@@ -1,18 +1,20 @@
-﻿namespace TheOmenDen.EventStore.Caching;
+﻿using TheOmenDen.EventStore.Locking;
+
+namespace TheOmenDen.EventStore.Caching;
 #nullable disable
-public class Cache<TKey, TITem>: ICache<TKey, TITem>, IDisposable
+public class Cache<TKey, TItem>: ICache<TKey, TItem>
 {
     #region Private Fields
     private bool _disposed;
-    private readonly Dictionary<TKey, TITem> _cache = new ();
+    private readonly Dictionary<TKey, TItem> _cache = new ();
     private readonly Dictionary<TKey, Timer> _timers = new();
-    private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim ();
+    
     #endregion
     protected Cache(){}
     #region Destruction Methods
     public void Clear()
     {
-        _locker.EnterWriteLock();
+        var isInTransaction = StartTransaction(nameof(TKey));
 
         try
         {
@@ -33,7 +35,10 @@ public class Cache<TKey, TITem>: ICache<TKey, TITem>, IDisposable
         }
         finally
         {
-            _locker.ExitWriteLock();
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
         }
     }
 
@@ -57,7 +62,202 @@ public class Cache<TKey, TITem>: ICache<TKey, TITem>, IDisposable
             return;
         }
         Clear();
-        _locker.Dispose();
+
+        LockInstance<TItem>.Remove(nameof(TKey));
+    }
+    #endregion
+    #region Implementations
+    public TItem this[TKey key] => Get(key);
+
+    public TItem Get(TKey key)
+    {
+        if (_disposed)
+        {
+            return default;
+        }
+
+        var isInTransaction = StartTransaction(nameof(TKey));
+        
+        try
+        {
+            return _cache.TryGetValue(key, out var value) 
+                ? value 
+                : default;
+        }
+        finally
+        {
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
+        }
+    }
+
+    public (bool, TItem) TryGet(TKey key)
+    {
+        if (_disposed)
+        {
+            return new (false, default);
+        }
+
+        var isInTransaction = StartTransaction(nameof(TKey));
+
+        try
+        {
+
+            return new(_cache.TryGetValue(key, out var value), value);
+        }
+        finally
+        {
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
+        }
+    }
+
+    public bool Exists(TKey key)
+    {
+        if (_disposed)
+        {
+            return false;
+        }
+
+        var isInTransaction = StartTransaction(nameof(TKey));
+
+
+        try
+        {
+            return _cache.ContainsKey(key);
+        }
+        finally
+        {
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
+        }
+    }
+
+    public void Add(TKey key, TItem value)
+    {
+        Add(key, value, Timeout.Infinite);
+    }
+
+    public void Add(TKey key, TItem value, int timeout, bool restartTimer = false)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        if (timeout == Timeout.Infinite && timeout < 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(timeout));
+        }
+
+        var isInTransaction = StartTransaction(nameof(TKey));
+
+        try
+        {
+            CheckTimer(key, timeout, restartTimer);
+
+            if (!_cache.ContainsKey(key))
+            {
+                _cache.Add(key, value);
+
+                return;
+            }
+
+            _cache[key] = value;
+        }
+        finally
+        {
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
+        }
+    }
+
+    public void Remove(TKey key)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        var isInTransaction = StartTransaction(nameof(TKey));
+
+        try
+        {
+            if (!_cache.ContainsKey(key))
+            {
+                return;
+            }
+
+            AttemptTimerDisposal(key);
+        }
+        finally
+        {
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
+        }
+    }
+
+    public void Remove(Predicate<TKey> pattern)
+    {
+        if (_disposed)
+        {
+            return;
+        }
+
+        var isInTransaction = StartTransaction(nameof(TKey));
+
+        try
+        {
+            var removers = _cache.Keys
+                .Where(k => pattern(k))
+                .Select(k => k)
+                .ToList();
+
+            foreach(var workKey in removers)
+            {
+                AttemptTimerDisposal(workKey);
+            }
+        }
+        finally
+        {
+            if(isInTransaction)
+            {
+                EndTransaction(nameof(TKey));
+            }
+        }
+    }
+
+    public bool StartTransaction(String key)
+    {
+        try
+        {
+            var transactionLock = LockInstance<TItem>.Create(key);
+
+            transactionLock.Wait();
+
+            return true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    public void EndTransaction(String key)
+    {
+        var transactionLock = LockInstance<TItem>.Get(key);
+
+        transactionLock.Release();
     }
     #endregion
     #region Private Methods
@@ -85,130 +285,6 @@ public class Cache<TKey, TITem>: ICache<TKey, TITem>, IDisposable
     {
         Remove((TKey)state);
     }
-    #endregion
-
-    public TITem this[TKey key] => Get(key);
-
-    public TITem Get(TKey key)
-    {
-        if (_disposed)
-        {
-            return default;
-        }
-
-        _locker.EnterReadLock();
-
-        try
-        {
-            return _cache.TryGetValue(key, out var value) 
-                ? value 
-                : default;
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public (bool, TITem) TryGet(TKey key)
-    {
-        if (_disposed)
-        {
-            return new (false, default);
-        }
-
-        _locker.EnterReadLock();
-
-        try
-        {
-
-            return new(_cache.TryGetValue(key, out var value), value);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public bool Exists(TKey key)
-    {
-        if (_disposed)
-        {
-            return false;
-        }
-
-        _locker.EnterReadLock();
-
-        try
-        {
-            return _cache.ContainsKey(key);
-        }
-        finally
-        {
-            _locker.ExitReadLock();
-        }
-    }
-
-    public void Add(TKey key, TITem value)
-    {
-        Add(key, value, Timeout.Infinite);
-    }
-
-    public void Add(TKey key, TITem value, int timeout, bool restartTimer = false)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        if (timeout == Timeout.Infinite && timeout < 1)
-        {
-            throw new ArgumentOutOfRangeException(nameof(timeout));
-        }
-
-        _locker.EnterWriteLock();
-        try
-        {
-            CheckTimer(key, timeout, restartTimer);
-
-            if (!_cache.ContainsKey(key))
-            {
-                _cache.Add(key, value);
-
-                return;
-            }
-
-            _cache[key] = value;
-        }
-        finally
-        {
-            _locker.ExitWriteLock();
-        }
-    }
-
-    public void Remove(TKey key)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _locker.EnterWriteLock();
-
-        try
-        {
-            if (!_cache.ContainsKey(key))
-            {
-                return;
-            }
-
-            AttemptTimerDisposal(key);
-        }
-        finally
-        {
-            _locker.ExitWriteLock();
-        }
-    }
 
     private void AttemptTimerDisposal(TKey key)
     {
@@ -224,31 +300,5 @@ public class Cache<TKey, TITem>: ICache<TKey, TITem>, IDisposable
         _timers.Remove(key);
         _cache.Remove(key);
     }
-
-    public void Remove(Predicate<TKey> pattern)
-    {
-        if (_disposed)
-        {
-            return;
-        }
-
-        _locker.EnterWriteLock();
-
-        try
-        {
-            var removers = _cache.Keys
-                .Where(k => pattern(k))
-                .Select(k => k)
-                .ToList();
-
-            foreach(var workKey in removers)
-            {
-                AttemptTimerDisposal(workKey);
-            }
-        }
-        finally
-        {
-            _locker.ExitWriteLock();
-        }
-    }
+    #endregion
 }
