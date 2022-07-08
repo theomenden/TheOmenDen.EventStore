@@ -1,8 +1,14 @@
 ﻿global using System.Collections;
 global using System.Collections.Concurrent;
 global using System.Linq.Expressions;
+global using System.Text.Json;
+global using TheOmenDen.EventStore.Aggregates;
+global using TheOmenDen.EventStore.Commands;
 global using TheOmenDen.EventStore.Events;
+global using TheOmenDen.EventStore.Exceptions;
+global using TheOmenDen.EventStore.Extensions;
 global using TheOmenDen.EventStore.Infrastructure;
 global using TheOmenDen.EventStore.Interfaces;
+global using TheOmenDen.EventStore.Logs.Stores;
 global using TheOmenDen.Shared.Accessors;
 global using TheOmenDen.Shared.Models;

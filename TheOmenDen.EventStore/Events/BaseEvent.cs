@@ -7,32 +7,25 @@
 /// <inheritdoc cref="IEquatable{T}"/>
 /// <inheritdoc cref="IComparable{T}"/>
 /// </summary>
-public abstract class BaseEvent : IEquatable<BaseEvent>, IComparable<BaseEvent>
+public abstract class BaseEvent : IEvent, IEquatable<BaseEvent>
 {
     protected BaseEvent()
     {
         Id = Guid.NewGuid();
-        CreatedAt = DateTime.Now;
     }
 
-    public Guid Id { get; init; }
+    public Guid Id { get; set; }
+    public abstract int MajorVersion { get; set; }
+    public abstract int MinorVersion { get; set; }
+    public abstract Guid IdentityTenant { get; set; }
+    public abstract Guid IdentityUser { get; set; }
+    public abstract DateTimeOffset EventTime { get; set; }
 
-    public DateTime CreatedAt { get; init; }
-
-    public int MajorVersion { get; set; } = 1;
-
-    public int MinorVersion { get; set; } = 0;
-
-    public string Data { get; init; }
-
-    public Type AggregateType { get; init; }
-
-    public Guid AggregateId { get; init; }
-
-    public override string ToString() => $"{AggregateType} {MajorVersion}.{MinorVersion}";
-
-    public bool Equals(BaseEvent other) => other is not null && Id == other.Id;
-
+    public bool Equals(BaseEvent other)
+    {
+        return other is not null
+               && other.Id == Id;
+    }
 
     public override bool Equals(object obj)
     {
@@ -49,18 +42,9 @@ public abstract class BaseEvent : IEquatable<BaseEvent>, IComparable<BaseEvent>
         return obj is BaseEvent other && Equals(other);
     }
 
-    public override int GetHashCode() => HashCode.Combine(Id, CreatedAt);
-
-    public int CompareTo(BaseEvent other)
+    public override int GetHashCode()
     {
-        if (other is null)
-        {
-            return 1;
-        }
-
-        return MinorVersion.CompareTo(other.MinorVersion)
-               + MajorVersion.CompareTo(other.MajorVersion)
-               + CreatedAt.CompareTo(other.CreatedAt);
+        return HashCode.Combine(Id, EventTime);
     }
 }
 
@@ -68,11 +52,10 @@ public abstract class BaseEvent : IEquatable<BaseEvent>, IComparable<BaseEvent>
 /// Generic wrapper for <see cref="BaseEvent"/>
 /// </summary>
 /// <typeparam name="T">The underlying type the event is acting upon</typeparam>
-public abstract class BaseEvent<T> : BaseEvent, IEvent<T>
+public abstract class BaseEvent<T> : BaseEvent
 {
     protected BaseEvent()
         : base()
     {
-        AggregateType = typeof(T);
     }
 }
