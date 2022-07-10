@@ -1,6 +1,5 @@
-﻿using TheOmenDen.EventStore.Commands;
+﻿namespace TheOmenDen.EventStore.Interfaces;
 
-namespace TheOmenDen.EventStore.Interfaces;
 public interface ICommandStore
 {
     bool Exists(Guid commandId);

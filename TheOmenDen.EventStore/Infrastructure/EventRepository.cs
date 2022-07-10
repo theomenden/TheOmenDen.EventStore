@@ -37,7 +37,7 @@ public class EventRepository : IEventRepository
             throw new ConcurrencyException(aggregate.Id);
         }
 
-        var events = await aggregate.FlushUncommittedChangesAsync(cancellationToken);
+        var events = await aggregate.FlushUncommittedChangesAsync(cancellationToken).ToArrayAsync(cancellationToken);
 
         await _store.SaveAsync(aggregate, events, cancellationToken);
 

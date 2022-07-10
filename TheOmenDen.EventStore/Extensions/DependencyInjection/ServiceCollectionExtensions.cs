@@ -1,34 +1,75 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿
 
 namespace TheOmenDen.EventStore.Extensions.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-    public static IServiceCollection AddEventStoreServices<T>(this IServiceCollection services)
+    private static readonly ILoggerFactory LoggerFactory = Microsoft.Extensions.Logging.LoggerFactory.Create(builder =>
     {
-        var containerType = typeof(T);
+        builder.AddConsole();
+    });
 
-        services.AddSingleton<IEventStream, EventStreamBase>();
+    public static IServiceCollection AddEventStoreServices<T>(this IServiceCollection services, Boolean shouldAddAdapters = true)
+    {
+        services.AddLazyCache();
 
-        services.Scan(scan => scan.FromAssembliesOf(typeof(IEventSubscriber<,>), containerType)
-            .AddClasses(c => c.AssignableTo(typeof(EventHandler<,>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
+        services.AddScoped<IEventQueue, EventQueue>();
+        
+        services.AddScoped<IEventRepository, EventRepository>();
 
-        services.Scan(scan => scan.FromAssembliesOf(typeof(IAsyncEventSubscriber<,>), containerType)
-            .AddClasses(c => c.AssignableTo(typeof(AsyncEventHandler<,>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
+        services.AddScoped<ICommandQueue, CommandQueue>();
 
-        services.Scan(scan => scan.FromAssembliesOf(typeof(IEventPublisher<,>), containerType)
-            .AddClasses(c => c.AssignableTo(typeof(EventPublisher<,>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
+        if (shouldAddAdapters)
+        {
+            AddMediatRAdapters<T>(services);
+        }
 
-        services.Scan(scan => scan.FromAssembliesOf(typeof(IAsyncEventPublisher<,>), containerType)
-            .AddClasses(c => c.AssignableTo(typeof(AsyncEventPublisher<,>)))
-            .AsImplementedInterfaces()
-            .WithTransientLifetime());
+        return services;
+    }
+
+    public static IServiceCollection AddEventStoreSqlServerServices(this IServiceCollection services, String databaseConnectionString)
+    {
+        services.AddPooledDbContextFactory<EventStoreContext>(options =>
+            options.UseSqlServer(databaseConnectionString)
+                .UseLoggerFactory(LoggerFactory)
+#if DEBUG
+                .EnableDetailedErrors()
+                .EnableSensitiveDataLogging()
+#endif
+                .EnableServiceProviderCaching()
+        );
+
+        return services;
+    }
+
+    public static IServiceCollection AddEventStoreSqlServerServices<TContext>(this IServiceCollection services, String databaseConnectionString)
+    where TContext: DbContext
+    {
+        //EventStoreContext
+        services.AddPooledDbContextFactory<TContext>(options =>
+        options.UseSqlServer(databaseConnectionString)
+            .UseLoggerFactory(LoggerFactory)
+#if DEBUG
+            .EnableDetailedErrors()
+            .EnableSensitiveDataLogging()
+#endif
+            .EnableServiceProviderCaching()
+        );
+
+        return services;
+    }
+
+    private static IServiceCollection AddMediatRAdapters<T>(this IServiceCollection services)
+    {
+        services.AddMediatR(typeof(IMediator).Assembly, typeof(T).Assembly);
+
+        services.AddTransient<MediatrToEventStoreAdapter>(provider =>
+            {
+                var mediator = provider.GetService<IMediator>();
+                var commandQueue = provider.GetService<ICommandQueue>();
+                return new (commandQueue!,mediator!);
+            }
+        );
 
         return services;
     }

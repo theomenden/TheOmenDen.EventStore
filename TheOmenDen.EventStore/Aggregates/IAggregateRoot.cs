@@ -4,19 +4,19 @@ public interface IAggregateRoot
 {
     Guid Id { get; set; }
 
-    int MajorVersion { get; set; }
+    Int32 MajorVersion { get; set; }
 
-    int MinorVersion { get; set; }
+    Int32 MinorVersion { get; set; }
 
     AggregateState State { get; set; }
 
     IEvent[] FlushUncommittedChanges();
 
-    ValueTask<IEvent[]> FlushUncommittedChangesAsync(CancellationToken cancellationToken = new());
+    IAsyncEnumerable<IEvent> FlushUncommittedChangesAsync(CancellationToken cancellationToken = new());
 
     IEvent[] GetUncommittedChanges();
 
-    ValueTask<IEvent[]> GetUncommittedChangesAsync(CancellationToken cancellationToken = new());
+    IAsyncEnumerable<IEvent> GetUncommittedChangesAsync(CancellationToken cancellationToken = new());
 
     void Rehydrate(IEnumerable<IEvent> history);
 

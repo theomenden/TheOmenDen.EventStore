@@ -1,16 +1,14 @@
-﻿using TheOmenDen.EventStore.Locking;
-
-namespace TheOmenDen.EventStore.Caching;
+﻿namespace TheOmenDen.EventStore.Caching;
 #nullable disable
-public class Cache<TKey, TItem>: ICache<TKey, TItem>
+public class Cache<TKey, TItem> : ICache<TKey, TItem>
 {
     #region Private Fields
     private bool _disposed;
-    private readonly Dictionary<TKey, TItem> _cache = new ();
+    private readonly Dictionary<TKey, TItem> _cache = new();
     private readonly Dictionary<TKey, Timer> _timers = new();
-    
+
     #endregion
-    protected Cache(){}
+    protected Cache() { }
     #region Destruction Methods
     public void Clear()
     {
@@ -35,7 +33,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -77,16 +75,16 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
         }
 
         var isInTransaction = StartTransaction(nameof(TKey));
-        
+
         try
         {
-            return _cache.TryGetValue(key, out var value) 
-                ? value 
+            return _cache.TryGetValue(key, out var value)
+                ? value
                 : default;
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -97,7 +95,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
     {
         if (_disposed)
         {
-            return new (false, default);
+            return new(false, default);
         }
 
         var isInTransaction = StartTransaction(nameof(TKey));
@@ -109,7 +107,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -132,7 +130,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -173,7 +171,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -200,7 +198,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -223,14 +221,14 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
                 .Select(k => k)
                 .ToList();
 
-            foreach(var workKey in removers)
+            foreach (var workKey in removers)
             {
                 AttemptTimerDisposal(workKey);
             }
         }
         finally
         {
-            if(isInTransaction)
+            if (isInTransaction)
             {
                 EndTransaction(nameof(TKey));
             }
@@ -241,7 +239,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
     {
         try
         {
-            var transactionLock = LockInstance<TItem>.Create(key);
+            var transactionLock = LockInstance<TKey>.Create(key);
 
             transactionLock.Wait();
 
@@ -255,7 +253,7 @@ public class Cache<TKey, TItem>: ICache<TKey, TItem>
 
     public void EndTransaction(String key)
     {
-        var transactionLock = LockInstance<TItem>.Get(key);
+        var transactionLock = LockInstance<TKey>.Get(key);
 
         transactionLock.Release();
     }

@@ -6,15 +6,14 @@ public interface IStore
 {
     void Save(Snapshot snapshot);
 
-    ValueTask<bool> SaveAsync(Snapshot snapshot, CancellationToken cancellationToken = default);
-
+    ValueTask<bool> SaveAsync(Snapshot snapshot, CancellationToken cancellationToken = new());
 
     void Box(Guid id);
 
-    ValueTask<bool> BoxAsync(Guid id, CancellationToken cancellationToken = default);
+    ValueTask<bool> BoxAsync(Guid id, CancellationToken cancellationToken = new());
 
     Snapshot Unbox(Guid id, Type aggregateRootType);
 
-    ValueTask<Snapshot> UnboxAsync(Guid id, Type aggregateRootType, CancellationToken cancellationToken = default);
+    ValueTask<Snapshot> UnboxAsync(Guid id, Type aggregateRootType, CancellationToken cancellationToken = new());
 }
 

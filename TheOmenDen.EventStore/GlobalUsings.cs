@@ -1,7 +1,13 @@
-﻿global using System.Collections;
+﻿
+global using LazyCache;
+global using MediatR;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.DependencyInjection;
+global using Microsoft.Extensions.Logging;
 global using System.Collections.Concurrent;
 global using System.Linq.Expressions;
 global using System.Text.Json;
+global using TheOmenDen.EventStore.Adapters;
 global using TheOmenDen.EventStore.Aggregates;
 global using TheOmenDen.EventStore.Commands;
 global using TheOmenDen.EventStore.Events;
@@ -9,6 +15,6 @@ global using TheOmenDen.EventStore.Exceptions;
 global using TheOmenDen.EventStore.Extensions;
 global using TheOmenDen.EventStore.Infrastructure;
 global using TheOmenDen.EventStore.Interfaces;
-global using TheOmenDen.EventStore.Logs.Stores;
-global using TheOmenDen.Shared.Accessors;
-global using TheOmenDen.Shared.Models;
+global using TheOmenDen.EventStore.Locking;
+global using TheOmenDen.EventStore.Logging.Stores;
+global using TheOmenDen.EventStore.Persistence;

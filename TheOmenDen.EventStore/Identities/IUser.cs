@@ -1,4 +1,4 @@
-﻿namespace TheOmenDen.EventStore.Identities;
+﻿namespace TheOmenDen.EventStore.Identities; 
 public interface IUser
 {
     Guid Id { get; }

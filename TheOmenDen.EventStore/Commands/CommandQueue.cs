@@ -65,7 +65,7 @@ public class CommandQueue: ICommandQueue
     {
         Identify(command);
 
-        SavedCommand savedCommand = null;
+        var savedCommand = default(SavedCommand);
 
         if (_saveAll)
         {
@@ -77,12 +77,14 @@ public class CommandQueue: ICommandQueue
 
         Execute(command);
 
-        if (_saveAll && savedCommand != null)
+        if (!_saveAll || savedCommand is null)
         {
-            savedCommand.SendCompletedAt = DateTimeOffset.UtcNow;
-            savedCommand.SendStatus = "Completed";
-            _store.Save(savedCommand, true);
+            return;
         }
+
+        savedCommand.SendCompletedAt = DateTimeOffset.UtcNow;
+        savedCommand.SendStatus = "Completed";
+        _store.Save(savedCommand, true);
     }
 
     public void Schedule(ICommand command, DateTimeOffset scheduledAt)

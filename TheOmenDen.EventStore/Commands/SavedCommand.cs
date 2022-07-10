@@ -1,4 +1,5 @@
 ﻿namespace TheOmenDen.EventStore.Commands;
+#nullable disable
 public class SavedCommand
 {
     public SavedCommand(ICommand command)

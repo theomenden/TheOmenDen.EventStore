@@ -1,6 +1,5 @@
-﻿using TheOmenDen.EventStore.Aggregates;
-
-namespace TheOmenDen.EventStore.Infrastructure.Snapshots;
+﻿namespace TheOmenDen.EventStore.Infrastructure.Snapshots;
+#nullable disable
 public sealed class Snapshot
 {
     public Guid AggregateIdentifier { get; set; }

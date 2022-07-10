@@ -3,7 +3,6 @@
 
 
 public static class LockInstance<T> 
-    where T : class
 {
     private static readonly Lockpool _locks = Lockpool.Instance;
     private static readonly object _cacheLock = new ();

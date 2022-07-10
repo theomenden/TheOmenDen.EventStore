@@ -32,6 +32,7 @@
 		<AssemblyVersion>$([System.DateTime]::Now.ToString("yyy.MM.dd.HHmm"))</AssemblyVersion>
 		<SignAssembly>False</SignAssembly>
 		<Authors>Andy - Alu</Authors>
+		<AssemblyOriginatorKeyFile>C:\Users\andre\OneDrive\Desktop\theomenden_cse.cer</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 	<Target Name="GenerateVersionInfo" BeforeTargets="BeforeBuild">
 		<WriteLinesToFile File="Properties\VersionInfo.cs" Lines="$(AssemblyFileVersionAttribute)" Overwrite="true">
@@ -39,6 +40,22 @@
 	</Target>
 
 	<ItemGroup>
+		<PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
+		<PackageReference Include="MediatR" Version="10.0.1" />
+		<PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="10.0.1" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="6.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="6.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="6.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="6.0.6">
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		  <PrivateAssets>all</PrivateAssets>
+		</PackageReference>
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="6.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="6.0.6" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="6.0.6">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />

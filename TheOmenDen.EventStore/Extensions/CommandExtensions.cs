@@ -1,4 +1,5 @@
 ﻿namespace TheOmenDen.EventStore.Extensions;
+#nullable disable
 public static class CommandExtensions
 {
     public static SavedCommand Deserialize(this SerializedCommand serializedCommand)

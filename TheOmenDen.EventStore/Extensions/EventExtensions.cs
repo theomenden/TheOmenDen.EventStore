@@ -1,7 +1,4 @@
-﻿using System.Text.Json;
-using TheOmenDen.EventStore.Logs.Stores;
-
-namespace TheOmenDen.EventStore.Extensions;
+﻿namespace TheOmenDen.EventStore.Extensions;
 public static class EventExtensions
 {
     public static IEvent Deserialize(this SerializedEvent serializedEvent)
@@ -13,6 +10,7 @@ public static class EventExtensions
         data.MinorVersion = serializedEvent.MinorVersion;
         data.IdentityTenant = serializedEvent.IdentityTenant;
         data.IdentityUser = serializedEvent.IdentityUser;
+        data.UnderlyingType = serializedEvent.UnderlyingType;
 
         return data;
     }
@@ -28,7 +26,7 @@ public static class EventExtensions
             MajorVersion = majorVersion,
             MinorVersion = minorVersion,
             EventTime = @event.EventTime,
-            EventClass = @event.GetType().GetClassName(),
+            UnderlyingType = @event.GetType(),
             EventData = data,
             IdentityTenant = Guid.Empty == tenantId ? tenantId : @event.IdentityTenant,
             IdentityUser = Guid.Empty == userId ? userId : @event.IdentityUser,

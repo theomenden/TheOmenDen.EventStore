@@ -9,6 +9,6 @@ public interface ICommand
 
     Guid IdentityUser { get; set; }
 
-    Guid AggregateIdentifier { get; set; }
+    Guid AggregateIdentifier { get; set; } 
 }
 

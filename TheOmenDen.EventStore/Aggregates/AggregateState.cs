@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 
 namespace TheOmenDen.EventStore.Aggregates;
-
+#nullable disable
 public abstract class AggregateState
 {
     public void Apply(IEvent @event)

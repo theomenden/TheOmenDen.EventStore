@@ -15,4 +15,6 @@ public interface IEvent
     Guid IdentityUser { get; set; }
 
     DateTimeOffset EventTime { get; set; }
+
+    Type UnderlyingType { get; set; }
 }

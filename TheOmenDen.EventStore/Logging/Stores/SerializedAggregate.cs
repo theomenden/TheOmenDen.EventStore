@@ -1,8 +1,8 @@
-﻿namespace TheOmenDen.EventStore.Aggregates;
+﻿namespace TheOmenDen.EventStore.Logging.Stores;
 #nullable disable
 public class SerializedAggregate
 {
-    public String Class { get; set; }
+    public string Class { get; set; }
 
     public DateTimeOffset? ExpiresAt { get; set; }
 

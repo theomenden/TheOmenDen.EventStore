@@ -20,6 +20,7 @@ public abstract class BaseEvent : IEvent, IEquatable<BaseEvent>
     public abstract Guid IdentityTenant { get; set; }
     public abstract Guid IdentityUser { get; set; }
     public abstract DateTimeOffset EventTime { get; set; }
+    public abstract Type UnderlyingType { get; set; }
 
     public bool Equals(BaseEvent other)
     {
