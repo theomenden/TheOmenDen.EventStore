@@ -1,7 +1,5 @@
 ﻿using System.Runtime.CompilerServices;
-using Microsoft.EntityFrameworkCore;
 using TheOmenDen.EventStore.Identities;
-using TheOmenDen.EventStore.Persistence;
 
 namespace TheOmenDen.EventStore.Infrastructure;
 internal sealed class EventStore: IEventStore

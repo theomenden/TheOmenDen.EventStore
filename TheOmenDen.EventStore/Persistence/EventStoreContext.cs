@@ -5,9 +5,9 @@ namespace TheOmenDen.EventStore.Persistence;
 
 public partial class EventStoreContext: DbContext
 {
-    public virtual DbSet<SerializedSnapshot> SerializedSnapshots { get; set; }
+    public virtual DbSet<SerializedSnapshot> SerializedSnapshots { get; set; } = null!;
 
-    public virtual DbSet<SerializedAggregate> SerializedAggregates { get; set; } = null;
+    public virtual DbSet<SerializedAggregate> SerializedAggregates { get; set; } = null!;
 
     public virtual DbSet<SerializedEvent> SerializedEvents { get; set; } = null!;
 

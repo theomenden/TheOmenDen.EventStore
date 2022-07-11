@@ -31,13 +31,29 @@
 		<PackageVersion>$([System.DateTime]::Now.ToString("yyyy.MM.dd.HHmm"))</PackageVersion>
 		<AssemblyVersion>$([System.DateTime]::Now.ToString("yyy.MM.dd.HHmm"))</AssemblyVersion>
 		<SignAssembly>False</SignAssembly>
-		<Authors>Andy - Alu</Authors>
+		<Authors>Andrew Beers (Alu)</Authors>
 		<AssemblyOriginatorKeyFile>C:\Users\andre\OneDrive\Desktop\theomenden_cse.cer</AssemblyOriginatorKeyFile>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<PackageIcon>omen-den-wave.png</PackageIcon>
+		<ApplicationIcon>600.ico</ApplicationIcon>
 	</PropertyGroup>
 	<Target Name="GenerateVersionInfo" BeforeTargets="BeforeBuild">
 		<WriteLinesToFile File="Properties\VersionInfo.cs" Lines="$(AssemblyFileVersionAttribute)" Overwrite="true">
 		</WriteLinesToFile>
 	</Target>
+	<ItemGroup>
+	  <Content Include="600.ico" />
+	</ItemGroup>
+	<ItemGroup>
+	  <None Include="..\..\TheOmenDen.Shared\Assets\omen-den-wave.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="LazyCache.AspNetCore" Version="2.4.0" />
@@ -60,7 +76,7 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<PackageReference Include="Microsoft.Extensions.Logging" Version="6.0.0" />
 		<PackageReference Include="Scrutor" Version="4.2.0" />
-		<PackageReference Include="TheOmenDen.Shared" Version="2022.7.5.231" />
+		<PackageReference Include="TheOmenDen.Shared" Version="2022.7.11.134" />
 	</ItemGroup>
 
 </Project>

@@ -1,4 +1,5 @@
-﻿namespace TheOmenDen.EventStore.Interfaces;
+﻿
+namespace TheOmenDen.EventStore.Interfaces;
 /// <summary>
 /// Marker interface for eventual subscribing
 /// </summary>
@@ -6,9 +7,9 @@ public interface IEvent
 {
     Guid Id { get; set; }
 
-    int MajorVersion { get; set; }
+    Int32 MajorVersion { get; set; }
 
-    int MinorVersion { get; set; }
+    Int32 MinorVersion { get; set; }
 
     Guid IdentityTenant { get; set; }
 

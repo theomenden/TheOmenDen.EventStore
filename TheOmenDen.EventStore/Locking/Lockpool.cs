@@ -1,15 +1,14 @@
-﻿
-namespace TheOmenDen.EventStore.Locking;
-internal sealed class Lockpool : ConcurrentDictionary<String, SemaphoreSlim>
+﻿namespace TheOmenDen.EventStore.Locking;
+internal sealed class LockPool : ConcurrentDictionary<String, SemaphoreSlim>
 {
-    private static readonly Lazy<Lockpool> LazyPool = new(CreatePool);
+    private static readonly Lazy<LockPool> LazyPool = new(CreatePool);
 
-    internal static Lockpool Instance  => LazyPool.Value;
+    internal static LockPool Instance  => LazyPool.Value;
 
-    private Lockpool(ConcurrentDictionary<String, SemaphoreSlim> dictionary)
+    private LockPool(ConcurrentDictionary<String, SemaphoreSlim> dictionary)
         : base(dictionary)
     { }
 
-    private static Lockpool CreatePool() => new (new ());
+    private static LockPool CreatePool() => new (new ());
   
 }

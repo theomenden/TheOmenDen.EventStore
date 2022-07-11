@@ -1,5 +1,7 @@
 ﻿namespace TheOmenDen.EventStore.Interfaces;
-
+/// <summary>
+/// Defines a simple messaging queue to allow for event publishing, subscription, and overriding
+/// </summary>
 public interface IEventQueue
 {
     void Publish(IEvent @event);

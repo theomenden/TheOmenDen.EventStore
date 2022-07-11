@@ -6,7 +6,6 @@ public class Cache<TKey, TItem> : ICache<TKey, TItem>
     private bool _disposed;
     private readonly Dictionary<TKey, TItem> _cache = new();
     private readonly Dictionary<TKey, Timer> _timers = new();
-
     #endregion
     protected Cache() { }
     #region Destruction Methods

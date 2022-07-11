@@ -65,6 +65,7 @@ where TState : AggregateState, new()
     public IAsyncEnumerable<IEvent> FlushUncommittedChangesAsync(CancellationToken cancellationToken = default)
     {
         var isInTransaction = StartTransaction(nameof(_changes));
+
         try
         {
             var changes = _changes.ToArray();
@@ -170,7 +171,6 @@ where TState : AggregateState, new()
         var isInTransaction = StartTransaction(nameof(TState));
         try
         {
-
             foreach (var change in history.ToList().AsReadOnly())
             {
                 if (change.MinorVersion != MinorVersion + 1)

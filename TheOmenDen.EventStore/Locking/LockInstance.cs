@@ -1,10 +1,12 @@
 ﻿namespace TheOmenDen.EventStore.Locking;
 #nullable disable
-
-
+/// <summary>
+/// Creates an instance of a <see cref="Semaphore"/> to lock down operations over a sequence
+/// </summary>
+/// <typeparam name="T">The underlying type requiring the <see cref="Semaphore"/></typeparam>
 public static class LockInstance<T> 
 {
-    private static readonly Lockpool _locks = Lockpool.Instance;
+    private static readonly LockPool _locks = LockPool.Instance;
     private static readonly object _cacheLock = new ();
 
     public static SemaphoreSlim Get(String key)
@@ -23,7 +25,7 @@ public static class LockInstance<T>
         {
             if(!_locks.ContainsKey(GetLockKey(key)))
             {
-                _locks.TryAdd(GetLockKey(key), new SemaphoreSlim(1, 1));
+                _locks.TryAdd(GetLockKey(key), new (1, 1));
             }
 
             return _locks[GetLockKey(key)];

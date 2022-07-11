@@ -1,6 +1,9 @@
 ﻿using TheOmenDen.EventStore.Caching;
 
 namespace TheOmenDen.EventStore.Infrastructure.Snapshots;
+/// <summary>
+/// Defines methods relevant to groups of events within a specified timeframe to improve the retrieval costs
+/// </summary>
 internal sealed class SnapshotRepository : IEventRepository
 {
     #region Private Fields
@@ -42,17 +45,14 @@ internal sealed class SnapshotRepository : IEventRepository
     public T Get<T>(Guid aggregateId) 
         where T : IAggregateRoot
     {
-        // If it is not in the cache then load the aggregate from the most recent snapshot.
         var aggregate = AggregateFactory<T>.CreateAggregate();
         var snapshotVersion = RestoreAggregateFromSnapshot(aggregateId, aggregate);
 
-        // If there is no snapshot then load the aggregate directly from the event store.
         if (snapshotVersion == -1)
         {
             return _eventRepository.Get<T>(aggregateId);
         }
 
-        // Otherwise load the aggregate from the events that occurred after the snapshot was taken.
         var events = _eventStore
             .Get(aggregateId, snapshotVersion)
             .Where(desc => desc.MajorVersion > snapshotVersion)

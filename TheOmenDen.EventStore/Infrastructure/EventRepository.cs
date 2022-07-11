@@ -1,4 +1,7 @@
 ﻿namespace TheOmenDen.EventStore.Infrastructure;
+/// <summary>
+/// <inheritdoc cref="IEventRepository"/>
+/// </summary>
 public class EventRepository : IEventRepository
 {
     private readonly IEventStore _store;

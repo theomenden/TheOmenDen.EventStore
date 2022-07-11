@@ -2,6 +2,9 @@
 
 namespace TheOmenDen.EventStore.Infrastructure.Snapshots;
 
+/// <summary>
+/// <inheritdoc cref="ISnapshotStore"/>
+/// </summary>
 internal sealed class SnapshotStore: ISnapshotStore
 {
     private readonly IDbContextFactory<EventStoreContext> _dbContextFactory;
