@@ -2,7 +2,7 @@
 
 public interface IIdentity
 {
-    ITenant Tentant { get; }
+    Tenant Tentant { get; }
 
-    IUser User { get; }
+    User User { get; }
 }

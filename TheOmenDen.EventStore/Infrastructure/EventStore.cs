@@ -1,23 +1,14 @@
 ﻿using System.Runtime.CompilerServices;
-using TheOmenDen.EventStore.Identities;
 
 namespace TheOmenDen.EventStore.Infrastructure;
 internal sealed class EventStore: IEventStore
 {
-    private readonly string _offlineFolderPath;
-
     private readonly IIdentityService _identityService;
 
     private readonly IDbContextFactory<EventStoreContext> _dbContextFactory;
 
     public EventStore(IDbContextFactory<EventStoreContext> contextFactory, IIdentityService identityService)
     {
-        var path = Directory.GetCurrentDirectory();
-
-        var offlineInformation = Directory.CreateDirectory($"{path}/offline");
-
-        _offlineFolderPath = offlineInformation.FullName;
-
         _identityService = identityService;
 
         _dbContextFactory = contextFactory;
@@ -33,22 +24,22 @@ internal sealed class EventStore: IEventStore
         return doesExist;
     }
 
-    public async ValueTask<bool> ExistsAsync(Guid aggregate, CancellationToken cancellationToken = default)
-    {
-        await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
-
-        var doesExist = await context.SerializedEvents
-            .AnyAsync(e => e.Id == aggregate, cancellationToken);
-
-        return doesExist;
-    }
-
     public bool Exists(Guid aggregate, int version)
     {
         using var context = _dbContextFactory.CreateDbContext();
 
         var doesExist = context.SerializedEvents
             .Any(e => e.Id == aggregate && e.MajorVersion == version);
+
+        return doesExist;
+    }
+
+    public async ValueTask<bool> ExistsAsync(Guid aggregate, CancellationToken cancellationToken = default)
+    {
+        await using var context = await _dbContextFactory.CreateDbContextAsync(cancellationToken);
+
+        var doesExist = await context.SerializedEvents
+            .AnyAsync(e => e.Id == aggregate, cancellationToken);
 
         return doesExist;
     }

@@ -36,9 +36,13 @@ internal sealed class SnapshotRepository : IEventRepository
         return _eventRepository.Save(aggregate, version);
     }
 
-    public ValueTask<IEvent[]> SaveAsync<T>(T aggregate, int? version = null, CancellationToken cancellationToken = new CancellationToken()) where T : IAggregateRoot
+    public async ValueTask<IEvent[]> SaveAsync<T>(T aggregate, int? version = null, CancellationToken cancellationToken = new CancellationToken()) where T : IAggregateRoot
     {
-        throw new NotImplementedException();
+        _cache.Add(aggregate.Id, aggregate);
+
+        await TakeSnapshotAsync(aggregate, false, cancellationToken);
+
+        return await _eventRepository.SaveAsync(aggregate, version, cancellationToken);
     }
     #endregion
     #region Get Methods
@@ -101,7 +105,7 @@ internal sealed class SnapshotRepository : IEventRepository
             return -1;
         }
 
-        // TODO: Is this needed when only the version is returned?
+        // Is this needed when only the version is returned?
 
          aggregate.Id = snapshot.AggregateIdentifier;
          aggregate.MajorVersion = snapshot.AggregateMajorVersion;

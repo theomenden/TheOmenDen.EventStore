@@ -1,6 +1,4 @@
-﻿using TheOmenDen.EventStore.Identities;
-
-namespace TheOmenDen.EventStore.Commands;
+﻿namespace TheOmenDen.EventStore.Commands;
 public class CommandQueue: ICommandQueue
 {
     private readonly Dictionary<String, Action<ICommand>> _subscribers;

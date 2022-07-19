@@ -42,14 +42,14 @@ public interface IEventRepository
         where T : IAggregateRoot;
 
     /// <summary>
-    /// 
+    /// Removes an aggregate from an "online" storage system and preserves it to a local storage system (file by default)
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="aggregate"></param>
     void Box<T>(T aggregate) where T : IAggregateRoot;
 
     /// <summary>
-    /// 
+    /// Removes an aggregate from an "online" storage system and preserves it to a local storage system (file by default)
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="aggregate"></param>
@@ -58,7 +58,7 @@ public interface IEventRepository
     Task BoxAsync<T>(T aggregate, CancellationToken cancellationToken = new()) where T : IAggregateRoot;
 
     /// <summary>
-    /// 
+    /// Removes an aggregate from an "offline" storage system and returns the most recent state
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="aggregate"></param>
@@ -66,7 +66,7 @@ public interface IEventRepository
     T Unbox<T>(Guid aggregate) where T : IAggregateRoot;
 
     /// <summary>
-    /// 
+    /// Removes an aggregate from an "offline" storage system and returns the most recent state
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="aggregate"></param>
